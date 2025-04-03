@@ -4,7 +4,7 @@ from .models import Item, StockMovement
 from .serializers import ItemSerializer, StockMovementSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated , AllowAny
 from django.utils import timezone
 from datetime import timedelta
 from django.shortcuts import render
@@ -77,48 +77,46 @@ def reset_inventory(request):
 
 @api_view(['GET'])
 def stock_movements_list(request):
-    current_date = timezone.now().date()
-    current_month_start = current_date.replace(day=1)
-    current_month_end = (current_month_start + relativedelta(months=1)) - timedelta(days=1)
+    try:
+        month_start = request.GET.get('month_start')
+        month_end = request.GET.get('month_end')
 
-    items = Item.objects.all()
-    result = []
+        items = Item.objects.all()
+        result = []
 
-    for item in items:
-        current_movement = StockMovement.objects.filter(
-            item=item,
-            period_start__lte=current_date,
-            period_end__gte=current_date
-        ).first()
-
-        if not current_movement:
-            current_movement = StockMovement.objects.create(
+        for item in items:
+            movements = StockMovement.objects.filter(
                 item=item,
-                period_start=current_month_start,
-                period_end=current_month_end,
-                remaining_stock=item.quantity,
-                quantity_added=0,
-                quantity_removed=0
+                period_start__gte=month_start,
+                period_end__lte=month_end
             )
 
-        result.append({
-            'name': item.name,
-            'opening_stock': current_movement.remaining_stock - current_movement.quantity_added + current_movement.quantity_removed,
-            'current_added': current_movement.quantity_added,
-            'current_removed': current_movement.quantity_removed,
-            'current_stock': current_movement.remaining_stock,
-            'alert_threshold': item.alert_threshold,
-            'month_start': current_movement.period_start.strftime("%d/%m/%Y"),
-            'month_end': current_movement.period_end.strftime("%d/%m/%Y")
-        })
+            result.append({
+                "name": item.name,
+                "movements": [
+                    {
+                        "period_start": mov.period_start,
+                        "period_end": mov.period_end,
+                        "quantity_added": mov.quantity_added,
+                        "quantity_removed": mov.quantity_removed,
+                        "remaining_stock": mov.remaining_stock
+                    }
+                    for mov in movements
+                ]
+            })
 
-    return Response(result)
+        return Response(result)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 @transaction.atomic
 def monthly_stock_reset(request):
     try:
+        if request.data:  # Handle empty payload
+            return Response({"error": "No data required"}, status=400)
         now = timezone.now()
         current_month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         items = Item.objects.all()
