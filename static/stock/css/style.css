@@ -1,0 +1,253 @@
+/* Define CSS variables for easier modifications */
+:root {
+    --primary-color: #007bff;
+    --secondary-color: #0056b3;
+    --text-color: white;
+    --background-color: #f4f4f4;
+  }
+
+  body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    display: flex;
+    background-color: var(--background-color);
+  }
+
+  /* Password Modal Styles */
+  #passwordModal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  #passwordModal .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+  }
+
+  /* Sidebar Styles */
+  .sidebar {
+    width: 250px;
+    height: 100vh;
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    padding-top: 20px;
+    position: fixed;
+  }
+
+  .sidebar h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .sidebar ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .sidebar ul li {
+    padding: 15px;
+    text-align: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  .sidebar ul li:hover {
+    background-color: var(--secondary-color);
+  }
+
+  /* Main Content & Sections */
+  .main-content {
+    margin-left: 250px;
+    width: calc(100% - 250px);
+    padding: 20px;
+  }
+
+  .section {
+    background: white;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+
+  /* Form Elements */
+  input, button, select {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+
+  button {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s ease-in-out, transform 0.2s ease;
+  }
+
+  button:hover {
+    background-color: var(--secondary-color);
+    transform: scale(1.05);
+  }
+
+  /* Item List */
+  .item-list {
+    margin-top: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    background: #fafafa;
+    border-radius: 8px;
+  }
+
+  .item-list div {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+  }
+
+  .item-list div:hover {
+    background: var(--primary-color);
+    color: var(--text-color);
+  }
+
+  .selected {
+    background-color: #28a745 !important;
+    color: var(--text-color) !important;
+    font-weight: bold;
+    transition: 0.3s ease-in-out;
+  }
+
+  /* Dashboard Search Results */
+  #dashboardSearchResults div {
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s ease-in-out;
+  }
+
+  #dashboardSearchResults div:hover {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+  }
+
+  /* Password Update Section in Settings */
+  .password-update {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .sidebar {
+      width: 200px;
+      position: static;
+    }
+    .main-content {
+      margin-left: 0;
+      width: 100%;
+    }
+    #toggleSidebar {
+      display: block;
+      background: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      padding: 10px;
+      cursor: pointer;
+      margin: 10px;
+    }
+  }
+
+  /* Hide toggle button on larger screens */
+  @media (min-width: 769px) {
+    #toggleSidebar {
+      display: none;
+    }
+  }
+
+  /* Dashboard Alert Table Styling */
+#dashboardAlert {
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#dashboardAlert h3 {
+  color: #dc3545;
+  margin-bottom: 15px;
+}
+
+.alert-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.alert-table th, .alert-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.alert-table th {
+  background-color: #f8f9fa;
+}
+
+/* Inventory Alert Styling */
+#alertArea {
+  padding: 12px;
+  background: #fff;
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  color: #dc3545;
+  font-weight: bold;
+  margin: 15px 0;
+}
+
+/* Add these styles */
+.print-indicator {
+    display: none;
+    color: red;
+    font-weight: bold;
+}
+
+@media print {
+    .print-indicator {
+        display: inline-block;
+    }
+    td[style*="color: red"] {
+        color: #000 !important;
+        font-weight: bold;
+        position: relative;
+    }
+    td[style*="color: red"]::after {
+        content: " (Low Stock)";
+        font-size: 0.8em;
+        color: #000;
+    }
+}

@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SmartStock Admin Dashboard</title>
+  <!-- Load static files -->
+  {% load static %}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'stock/css/style.css' %}" />
+</head>
+<body>
+  <!-- Password Modal -->
+  <div id="passwordModal">
+    <div class="modal-content">
+      <h2>Enter Password</h2>
+      <input type="password" id="passwordInput" placeholder="Password" />
+      <button onclick="checkPassword()">Submit</button>
+      <div id="passwordError" style="color: red; display: none;">Incorrect password. Please try again.</div>
+    </div>
+  </div>
+
+  <!-- Sidebar toggle button for mobile devices -->
+  <button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
+
+  <div class="sidebar">
+    <h2>SmartStock Admin</h2>
+    <ul>
+      <li onclick="showSection('dashboard')"><i class="fas fa-chart-line"></i> Dashboard</li>
+      <li onclick="showSection('inventory')"><i class="fas fa-boxes"></i> Inventory</li>
+      <li onclick="showSection('stockOverview')"><i class="fas fa-warehouse"></i> Etat de Stock</li>
+      <li onclick="showSection('settings')"><i class="fas fa-cog"></i> Settings</li>
+    </ul>
+  </div>
+
+  <div class="main-content">
+    <!-- Dashboard Section -->
+    <div class="section" id="dashboard">
+      <h2><i class="fas fa-chart-line"></i> Dashboard Overview</h2>
+      <p>Welcome to the SmartStock Admin Dashboard. Manage inventory efficiently.</p>
+      <!-- Dashboard Alert -->
+      <div id="dashboardAlert" aria-live="polite" style="display: none;">
+        <h3 style="color: #dc3545; margin-bottom: 10px;">⚠ Low Stock Alerts</h3>
+        <table class="alert-table">
+          <thead>
+            <tr>
+              <th>Item Name</th>
+              <th>Current Quantity</th>
+              <th>Threshold</th>
+            </tr>
+          </thead>
+          <tbody id="dashboardAlertBody">
+            <!-- Low-stock items will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+      <!-- Dashboard Search -->
+      <div id="dashboardSearchContainer">
+        <input type="text" id="dashboardSearchInput" placeholder="Rechercher un item..." onkeyup="filterDashboardItems()" />
+        <div id="dashboardSearchResults"></div>
+      </div>
+    </div>
+
+    <!-- Inventory Section -->
+    <div class="section" id="inventory" style="display:none;">
+      <h2><i class="fas fa-boxes"></i> Manage Inventory</h2>
+      <div id="itemError" style="color: red; display: none; margin: 10px 0; padding: 10px;
+       background-color: #ffeeee; border: 1px solid #ffcccc; border-radius: 5px;"></div>
+      <label for="itemName">Nom de l'article :</label>
+      <input type="text" id="itemName" placeholder="Nom de l'article" />
+
+      <label for="quantity">Quantité :</label>
+      <input type="number" id="quantity" placeholder="Quantité" />
+
+      <label for="itemType">Type :</label>
+      <select id="itemType">
+        <option value="A">Type A</option>
+        <option value="B">Type B</option>
+        <option value="C">Type C</option>
+      </select>
+
+      <button onclick="addItem()" title="Cliquez pour ajouter l'article">Ajouter l'article</button>
+
+      <div id="alertArea" aria-live="polite"></div>
+
+      <div class="item-list" id="itemList"></div>
+
+      <label for="adjustQuantity">Quantité à ajuster :</label>
+      <input type="number" id="adjustQuantity" placeholder="Entrer la quantité à ajuster" />
+
+      <button onclick="increaseQuantity()" title="Augmentez la quantité">Augmenter la quantité</button>
+      <button onclick="decreaseQuantity()" title="Diminuez la quantité">Diminuer la quantité</button>
+      <button onclick="removeItem()" title="Supprimez l'article sélectionné">Supprimer l'article sélectionné</button>
+
+      <!-- Inventory Search -->
+      <label for="searchInput">Recherche dans l'inventaire :</label>
+      <input type="text" id="searchInput" placeholder="Rechercher dans l'inventaire..." onkeyup="searchItems()" />
+    </div>
+
+    <!-- Stock Overview Section -->
+    <div class="section" id="stockOverview" style="display:none;">
+      <h2><i class="fas fa-warehouse"></i> Etat de Stock</h2>
+      <table id="stockTable">
+        <thead>
+          <tr>
+            <th>Nom de l'article</th>
+            <th>Quantité en stock arrêtée au début du mois <span id="currentMonthStart"></span></th>
+            <th>Quantité ajoutée</th>
+            <th>Quantité retirée</th>
+            <th>Quantité en stock arrêtée au fin du mois <span id="currentMonthEnd"></span></th>
+            <th>Seuil d'alerte</th>
+          </tr>
+        </thead>
+        <tbody id="stockTableBody">
+          <!-- Stock data will be displayed here -->
+        </tbody>
+      </table>
+      <button id="printButton" onclick="printPage()">Imprimer le stock</button>
+    </div>
+
+    <!-- Settings Section -->
+    <div class="section" id="settings" style="display:none;">
+      <h2><i class="fas fa-cog"></i> Paramètres</h2>
+      <p>Modifier les préférences et configurations du système ici.</p>
+      <button id="resetButton" onclick="resetList()">Réinitialiser l'inventaire</button>
+
+      <!-- Password Update Form -->
+      <div class="password-update">
+        <h3>Update Password</h3>
+        <label for="oldPassword">Ancien mot de passe :</label>
+        <input type="password" id="oldPassword" placeholder="Entrez l'ancien mot de passe" />
+        <label for="newPassword">Nouveau mot de passe :</label>
+        <input type="password" id="newPassword" placeholder="Entrez le nouveau mot de passe" />
+        <button onclick="updatePassword()">Mettre à jour le mot de passe</button>
+        <div id="updateMessage" style="color: green; display: none;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Load JavaScript files -->
+  <script src="{% static 'stock/js/app.js' %}"></script>
+  <script>
+    // Sidebar toggle function for mobile devices
+    function toggleSidebar() {
+      const sidebar = document.querySelector('.sidebar');
+      if (sidebar.style.display === 'none' || getComputedStyle(sidebar).display === 'none') {
+        sidebar.style.display = 'block';
+      } else {
+        sidebar.style.display = 'none';
+      }
+    }
+  </script>
+</body>
+</html>
